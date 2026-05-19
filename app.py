@@ -1,9 +1,8 @@
+import cv2
 pip uninstall easyocr opencv-python opencv-python-headless -y
 pip install torch torchvision --index-url https://pytorch.org
 pip install opencv-python-headless
-pip install easyocrimport streamlit as st
-
-import cv2
+pip install easyocr
 import numpy as np
 from PIL import Image
 import re
