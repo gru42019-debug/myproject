@@ -5,20 +5,20 @@ import numpy as np
 from PIL import Image
 import re
 
-
+# 1. НАСТРОЙКА НА СТРАНИЦАТА
 st.set_page_config(page_title="Скенер за Вредни Съставки", page_icon="🥗", layout="centered")
 
-
+# 2. ИНИЦИАЛИЗАЦИЯ НА EASYOCR (Кешира се, за да не се зарежда всеки път)
 @st.cache_resource
 def load_ocr_reader():
-   
+    # Зареждаме български и английски език
     return easyocr.Reader(['bg', 'en'], gpu=False)
 
 reader = load_ocr_reader()
 
-
+# 3. РАЗШИРЕНИ БАЗИ ДАННИ (База със съставки и заместители)
 HAZARDOUS_INGREDIENTS = {
-   
+    # Е-номера (Оцветители, Консерванти, Подобрители)
     "E102": "Тартразин (изкуствен жълт оцветител, свързан с хиперактивност).",
     "E110": "Сънсет жълто (опасен за деца, забранен в някои страни).",
     "E122": "Азорубин (червен оцветител, потенциален алерген).",
@@ -34,7 +34,7 @@ HAZARDOUS_INGREDIENTS = {
     "E951": "Аспартам (изкуствен подсладител, свързан с неврологични проблеми).",
     "E952": "Цикламат (изкуствен подсладител, забранен в САЩ поради риск от рак).",
     
-    
+    # Други вредни съставки (Трансмазнини, захари, рафинирани продукти)
     "хидрогенирано": "Хидрогенирани мазнини (трансмазнини, запушват кръвоносните съдове).",
     "хидрогенирани": "Хидрогенирани мазнини (риск от сърдечно-съдови заболявания).",
     "палмово масло": "Рафинирано палмово масло (високо съдържание на наситени мазнини).",
@@ -47,7 +47,7 @@ HAZARDOUS_INGREDIENTS = {
     "натриев нитрит": "Канцерогенен консервант, масов в преработеното месо."
 }
 
-
+# База данни за категории продукти и техните здравословни алтернативи
 REPLACEMENT_SUGGESTIONS = {
     "чипс": ["Чипс от печена елда или нахут", "Домашен чипс от картофи на фурна", "Печени ядки (бадеми, орехи)"],
     "газирана": ["Газирана вода с лимон и мента", "Домашен студен чай със стевия", "Комбуча"],
@@ -61,17 +61,18 @@ REPLACEMENT_SUGGESTIONS = {
     "сладолед": ["Замразен пасиран банан (Nice cream)", "Кисело мляко с горски плодове и мед", "Домашно сорбе"]
 }
 
-
+# 4. ФУНКЦИЯ ЗА АНАЛИЗ НА ТЕКСТА
 def analyze_text(text):
     found_bad_stuff = {}
     text_lower = text.lower()
     
+    # Проверка за вредни съставки
     for ingredient, description in HAZARDOUS_INGREDIENTS.items():
-        
+        # Регулярен израз за точно съвпадение или част от дума
         if re.search(r'\b' + re.escape(ingredient.lower()) + r'\b', text_lower) or ingredient.lower() in text_lower:
             found_bad_stuff[ingredient] = description
             
-    
+    # Класификация на продукта за намиране на заместител
     suggested_alternatives = []
     for category, alternatives in REPLACEMENT_SUGGESTIONS.items():
         if category in text_lower:
@@ -79,11 +80,11 @@ def analyze_text(text):
             
     return found_bad_stuff, list(set(suggested_alternatives))
 
-
+# 5. ПОТРЕБИТЕЛСКИ ИНТЕРФЕЙС (UI)
 st.title("🥗 Скенер за вредни съставки в храните")
 st.write("Снимайте или качете етикета със съставките на продукта (текста, не баркода).")
 
-
+# Два варианта за вход: Камера на живо или Галерия
 source_option = st.radio("Изберете метод на сканиране:", ("📷 Камера на място", "📁 Снимка от галерия"))
 
 image_file = None
@@ -93,29 +94,29 @@ if source_option == "📷 Камера на място":
 elif source_option == "📁 Снимка от галерия":
     image_file = st.file_uploader("Качете снимка на етикета", type=["jpg", "jpeg", "png"])
 
-
+# 6.ОБРАБОТКА НА СНИМКАТА И OCR
 if image_file is not None:
-   
+    # Конвертиране на файла в изображение за OpenCV
     image = Image.open(image_file)
     image_np = np.array(image)
     
     st.image(image, caption="Качено изображение", use_container_width=True)
     
     with st.spinner("⏳ Текстът се разчита... Моля, изчакайте."):
-      
+        # Извличане на текст чрез EasyOCR
         ocr_result = reader.readtext(image_np)
         
-       
+        # Обединяване на всички открити текстови блокове в един низ
         full_text = " ".join([detection[1] for detection in ocr_result])
         
     st.subheader("📝 Разчетен текст от етикета:")
     if full_text.strip():
         st.info(full_text)
         
-       
+        # Анализ на прочетения текст
         detected_hazards, alternatives = analyze_text(full_text)
         
-      
+        # 7. ИЗВЕЖДАНЕ НА РЕЗУЛТАТИТЕ
         st.divider()
         if detected_hazards:
             st.error(f"⚠️ Внимание! Намерени са {len(detected_hazards)} вредни/съмнителни съставки:")
@@ -124,14 +125,14 @@ if image_file is not None:
         else:
             st.success("✅ Не са открити критични вредни съставки от нашата база данни в този етикет.")
             
-  
+        # 8. НАДГРАЖДАНЕ: ПРЕДЛОЖЕНИЯ ЗА ЗАМЕСТИТЕЛИ
         st.subheader("💡 Здравословни алтернативи:")
         if alternatives:
             st.write("Препоръчваме да замените този продукт с:")
             for alt in alternatives:
                 st.markdown(f"🍏 {alt}")
         else:
-            
+            # Ако не е засечена конкретна категория, даваме общи препоръки за чиста храна
             st.write("Не можахме да определим точната категория на продукта. Общи съвети:")
             st.markdown("🍏 Избирайте продукти с под 5 съставки на етикета.")
             st.markdown("🍏 Избягвайте храни, съдържащи думите 'хидрогениран' или 'Е-номера' над E400.")
