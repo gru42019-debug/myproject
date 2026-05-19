@@ -1,7 +1,7 @@
 streamlit
+easyocr
+torch --index-url https://pytorch.org
+torchvision --index-url https://pytorch.org
 opencv-python-headless
 numpy
 Pillow
-easyocr --no-cache-dir
-torch --index-url https://pytorch.org
-torchvision --index-url https://pytorch.org
