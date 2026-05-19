@@ -1,4 +1,10 @@
-
+streamlit
+easyocr
+torch --index-url https://pytorch.org
+torchvision --index-url https://pytorch.org
+opencv-python-headless
+numpy
+Pillow
 
 # 1. НАСТРОЙКА НА СТРАНИЦАТА
 st.set_page_config(page_title="Smart Food Scanner", page_icon="🥗", layout="centered")
