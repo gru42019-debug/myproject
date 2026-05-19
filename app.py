@@ -1,5 +1,4 @@
 import streamlit as st
-import easyocr
 import cv2
 import numpy as np
 from PIL import Image
