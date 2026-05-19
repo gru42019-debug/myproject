@@ -1,8 +1,3 @@
-import streamlit as st
-import cv2
-import numpy as np
-from PIL import Image
-import re
 
 
 # 1. НАСТРОЙКА НА СТРАНИЦАТА
