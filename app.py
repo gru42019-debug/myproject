@@ -1,10 +1,9 @@
-streamlit
-easyocr
-torch --index-url https://pytorch.org
-torchvision --index-url https://pytorch.org
-opencv-python-headless
-numpy
-Pillow
+import streamlit as st
+import easyocr
+import cv2
+import numpy as np
+from PIL import Image
+import re
 
 # 1. НАСТРОЙКА НА СТРАНИЦАТА
 st.set_page_config(page_title="Smart Food Scanner", page_icon="🥗", layout="centered")
