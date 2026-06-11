@@ -1,7 +1,8 @@
 import streamlit as st
 import numpy as np
-from PIL import Image
 import re
+import text
+import Pillow
 
 
 # 1. НАСТРОЙКА НА СТРАНИЦАТА
