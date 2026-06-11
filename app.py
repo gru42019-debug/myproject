@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
-import easyocr
+import easyocr  # <--- Увери се, че този ред го има!
 import re
 
 
