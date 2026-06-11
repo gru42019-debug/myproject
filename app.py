@@ -1,8 +1,8 @@
-python
 import streamlit as st
 import numpy as np
 from PIL import Image
 import re
+
 
 # 1. НАСТРОЙКА НА СТРАНИЦАТА
 st.set_page_config(page_title="Smart Food Scanner", page_icon="🥗", layout="centered")
